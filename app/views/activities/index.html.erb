@@ -1,0 +1,78 @@
+<h1>Listing activities</h1>
+
+<table>
+
+
+  <tbody>
+    <% @activities.each do |activity| %>
+
+      <tr>
+        <td><h3 style="color:blue">Activity Desctription: </h3></td>
+      </tr>
+      <tr>
+        <td><strong><%= activity.description %></strong></td>
+
+        <% if activity.user_id.to_i == current_user.id %> 
+        <!-- delete only if current user creatd the event -->
+          <td><%= link_to 'Edit', edit_activity_path(activity) %></td>
+          <td><%= link_to 'Destroy', activity, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <% end %>
+      </tr>
+
+      <tr>
+        <td><h4 style="color:red">Created By: </h4></td>
+
+        <td><h4><%= @users.find(activity.user_id.to_i).username %></h4></td>
+      </tr>
+
+      <tr>
+        
+          <td><h4 style="color:green">People Joining: </h4></td>
+          <% activity.attendees.each do |attendee| %>
+          <td><text> <%= @users.find(attendee.user_id).username.to_s %> , </text></td>
+          <% end %>
+
+      </tr>      
+
+      <tr>
+        <td>
+
+        <% if activity.attendees.where("user_id is ?" , current_user).blank?  %> 
+              <!-- .blank? returns if the DB query has any rows inside or not -->
+
+          <%= button_to 'Join', attendees_path(:id => activity) %>
+              <!-- store the activity id, to be used in Many to Many relation in Attendees controller - method Create -->
+
+        <% else %>
+
+          <%= button_to 'Unattend', attendee_path(activity.attendees.where("user_id is ?" , current_user).first.id), method: :delete %>
+                <!-- finding the path to the created attendee for the specific activity
+                Search an easier way?!?
+                Until then that will work too -->
+
+        <% end %>
+
+        </td>
+      </tr>
+
+
+      <tr>
+        <td>____________________________</td>
+      </tr>
+
+
+
+
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+
+
+<h1>New activity</h1>
+
+<%= render 'form' %>
+
+
